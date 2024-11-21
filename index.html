@@ -164,3 +164,184 @@ Radio gives the choices, if above is seleted as true, like home or business addr
 <p><input type="radio" id="home" value="Home" v-model="order.method"></p>
 Can select default options in order with 'home' for method and false properties for gift
 -->
+
+
+<style>
+
+  .lessonDescription {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 20x;
+  }
+  
+  /*Lesson header*/
+  h1 {
+  padding: 20px;
+  margin-bottom: -20px;
+  }
+  
+  /*Background and text styling*/
+  #app {
+    background-color: beige;
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+    font-family: 'Fraunces';
+    font-size: 22px;
+    /**font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;*/
+    /** To make website fit page */
+  }
+  
+  p {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  }
+  
+  /*Entire lessons section div*/
+  #Lessons {
+    border: solid 2px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    align-items: center;
+    border-color: darkgrey;
+  }
+  
+  
+  
+  /* Styling for each individual lesson / lesson div
+  #lesson-item {
+  
+  }
+  */
+  
+  /* Styling of each individual image displayed in div */
+  .lesson-image {
+    height: 50px;
+    width: 50px;
+    padding-bottom: 15px;
+  }
+  
+  /*Each individual div of the lesson items*/
+  #Lesson1,
+  #Lesson2,
+  #Lesson3 {
+    border: solid 2px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    margin-right: 70px;
+    padding-bottom: 20px;
+    flex: content;
+    align-items: flex-start;
+    border-style: inset;
+    padding-right: 80%;
+    padding-left: 20px;
+  }
+  
+  /*When hovering over lesson item, change background*/
+  #Lesson1:hover {
+    background-image: url(../public/images/geography.jpg);
+    
+    color: white;
+  }
+  
+  #Lesson2:hover {
+    background-image: url(../public/images/english.jpg);
+    color: white;
+  }
+  
+  #Lesson3:hover {
+    background-image: url(../public/images/maths.jpg);
+    color: white;
+  }
+  
+  /*Search bar input form*/
+  #searchBar {
+    color: black;
+    border-radius: 30px;
+    border: 1px solid;
+    padding: 10px;
+    width: 250px;
+    margin-left: 16%;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /*Buttons styling*/
+  #searchButton,
+  .addToCartButton {
+    border-radius: 30px;
+    border: 1px solid;
+    padding: 10px;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
+    text-decoration-color: azure;
+  
+    appearance: none;
+    background-color: transparent;
+    border: 1px solid #1A1A1A;
+    border-radius: 15px;
+    box-sizing: border-box;
+    color: #3B3B3B;
+    cursor: pointer;
+    display: inline-block;
+    font-family: Roobert, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 16px;
+    font-weight: 600;
+    line-height: normal;
+    margin: 0;
+    height: 50px;
+    width: 190px;
+    outline: none;
+    padding: 12px 10px;
+    text-align: center;
+    text-decoration: none;
+    transition: all 300ms cubic-bezier(.23, 1, 0.32, 1);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    will-change: transform;
+    margin-left: 15px;
+  }
+  
+  #searchButton:disabled,
+  .addToCartButton:disabled {
+    pointer-events: none;
+  }
+  
+  /*Change style and background colour when hovering*/
+  #searchButton:hover,
+  .addToCartButton:hover {
+    color: #fff;
+    background-color: #1A1A1A;
+    box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
+    transform: translateY(-2px);
+  }
+  
+  .button-28:active {
+    box-shadow: none;
+    transform: translateY(0);
+  }
+  
+  /*Cart icon*/
+  #carticon {
+    margin-left: 70%;
+    margin-top: 10px;
+    margin-bottom: -30px;
+  }
+  
+  /*Styling of add to cart button*/
+  .addToCartButton {
+    border-radius: 15px;
+    border: solid 1px;
+  }
+  
+  /*Change colour of button when hovering over it*/
+  button:hover {
+    background-color: darkgray;
+  }
+  </style>
+  
