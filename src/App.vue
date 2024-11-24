@@ -3,7 +3,7 @@
 
     <header>
       <!-- Website name / Welcome message -->
-      <h1>{{ sitename }}</h1>
+      <h1>Welcome to the Lessons Store</h1>
     </header>
 
     <!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->

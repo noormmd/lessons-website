@@ -3,6 +3,7 @@
 
     <header>
       <!-- Website name / Welcome message -->
+       <p>Testing</p>
       <h1>{{ sitename }}</h1>
     </header>
 
