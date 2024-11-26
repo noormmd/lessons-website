@@ -9,7 +9,6 @@
     "lint": "vue-cli-service lint",
     "start": "nodemon express.mjs",
   "deploy": "vue-cli-service build && gh-pages -d dist"
-}
   },
   "dependencies": {
     "body-parser": "^1.20.3",
