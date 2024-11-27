@@ -227,6 +227,7 @@ export default {
   }, // fetch will call our server, 
   created: function () {
     const that = this; 
+   /**
     // fetch API call, retrieves response from back end to present to front end
     fetch("http://localhost:3000/lessons").then(
       function (response) //function will manage the response
@@ -239,11 +240,23 @@ export default {
           }
         )
       }
-    );
-
+    ),
+      function () {*/
+          // Fetch API call, retrieves response from Render to present to front end
+          fetch("https://lessons-ecommerce-website-rest-api3.onrender.com/lessons").then(
+          function (response) {
+            response.json().then(
+              function (json) {
+                //alert(json); To show data as an alert
+                //console.log(json); To show data in the console
+                that.lessons = json;
+              }
+            )
+          }
+        )
+      /**}*/
   }
 };
-
 
 /** 
 // Functionality to show specific sections after hiding the mainPage section
