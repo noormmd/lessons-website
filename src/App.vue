@@ -19,11 +19,40 @@
   </div>
 
   <main>
-    <!-- Cart -->
-    <a @click="toggleCart" id="cart" disabled><img alt="Cart" id="carticon" src="../public/images/cart-icon.png"> {{ NOfItemsInCart }}
+
+    <!--Cart button-->
+    <!-- Toggles cart visibility function when clicked
+  disables when cart length is absolute 0 -->
+    <a id="cart" @click="toggleCart" :disabled="cart.length === 0">
+      <img alt="Cart" id="carticon" src="../public/images/cart-icon.png">
+      <!--Displays number of items-->
+      {{ NOfItemsInCart }}
+      <!--Displays view cart if length of variables within cart is more than 0-->
+      {{ cart.length > 0 ? "View your cart" : "No items in cart" }}
     </a>
-    <!--Function to show cart-->
-    <!--<div v-if="cart">-->
+
+
+
+<!-- Cart Page -->
+
+<!--If statement, if cart visible = true then show div-->
+<div v-if="cartVisible">
+ 
+ <h2>Shopping Cart</h2>
+ <!-- Display lessons -->
+ <ul>
+   <li v-for="(lesson, index) in cart" :key="index">
+     {{ lesson.subject }}
+     <button @click="removeFromCart(index, lesson)">Remove</button>
+   </li>
+ </ul>
+</div>
+
+<!-- Shows the cart page if cartVisible is true -->
+<!-- v-else shows the lesson list if otherwise -->
+
+<div v-else>
+  <!-- Lesson page / section -->
 
     <!-- Search functionality via to do list workshop-->
     <div id="SearchFunctionality">
@@ -49,7 +78,10 @@
           <br>
           <!-- Button to add to cart with Vue event handler, using id -->
           <!-- When availability is less than or equal to 0 disable button -->
-          <button class="addToCartButton" @click="addToCart(lesson.id)" :disabled="lesson.availability <= 0">
+          <button class="addToCartButton"
+          @click="addToCart(lesson.id)"
+          :disabled="lesson.availability <= 0">
+          
             <!--Using ternary operator (IF statement TRUE ? option 1 : ELSE option 2)-->
             <!-- If lesson availability is greater than 0, then show "add to cart" for button, else show "no lessons available"-->
             {{ lesson.availability > 0 ? "Add to Cart" : "No lessons available" }}
@@ -79,32 +111,25 @@
       <div id="Lesson3">
         <h3>Maths</h3>
         <p>Information: {{ lessons.description }}</p>
-        <button class="addToCartButton" value="Add to the Cart" v-if="isAvailable" @click="addToCart">Add to
-          cart</button>
-        <!-- IF ELSE CASE If you have added too many items, if else gets run
-         where button gets disabled and message shows -->
-        <div v-else>
-          <button disabled>
-            Disabled button
-          </button>
-          Selected the maximum number of available lessons
-        </div>
-
+        <!-- <button class="addToCartButton" value="Add to the Cart" v-if="isAvailable" @click="addToCart">Add to
+          cart</button> -->
+        <!-- Performs v-on and calls the addToCart function when button is clicked -->
+        <!-- passing the lesson as an argument -->
+        <button class="addToCartButton" @click="addToCart(lesson)" :disabled="lesson.availability <= 0">
+          <!-- Dynamically binds the disabled attribute -->
+          {{ lesson.availability > 0 ? "Add to Cart" : "No lessons available" }}
+        </button>
+        <!-- If spaces is greater, then 0 then display add to cart otherwise no lessons available-->
+        <!-- Disables button when the spaces property of the lesson is <= 0 -->
       </div>
     </div>
 
+    </div> <!--End of v-else display lessons div section-->
   </main>
-
-  <!--
-</div>
-Show cart outside of main page through cart div using if function (potential idea)
-<div v-else>
-
-  </div>
--->
   
-<!-- Checkout/cart section which will be shown after cart is clicked -->
-  <h1>Welcome to Checkout</h1>
+
+  <!-- Checkout/cart section which will be shown after cart is clicked -->
+  <h2>Welcome to Checkout</h2>
   <p><!--Binding name with v-model-->
     First name:
   </p>
@@ -148,7 +173,6 @@ Show cart outside of main page through cart div using if function (potential ide
   <p>Zip/Postcode: {{ order.postcode }}</p>
   <p>Deliver to address: {{ order.address }}</p>
   {{ order.lesson }}
-
   <!--
 using v-for without key
 If you don't need key
@@ -192,24 +216,58 @@ export default {
         postcode: "",
         address: "",
         lessonid: ""
+      },
+      lesson: {
+        lessonId: "",
+        subject: "",
+        location: "",
+        price: 0,
+        description: "",
+        availability: 5,
+        image: ""
+      },
+      newLesson: {
+        lessonId: "",
+        subject: "",
+        location: "",
+        price: 0,
+        description: "",
+        availability: 0,
+        image: ""
       }
     };
   },
 
   methods: {
-    // function to push the lesson id of product into cart
-    //define lessonId
-    addToCart(lessonId) {
-      this.cart.push(lessonId);
+    // Function to push the lesson into cart
+    // define which lesson
+    addToCart(lesson) {
+     if (lesson.availability > 0) {
+    this.cart.push(lesson); // Add the lesson to the cart
+    lesson.availability--;  // Decrement availability by 1
+    alert(`Added to cart. Remaining availability: ${lesson.availability}`);
+  } else {
+    alert("No availability left!");
+  }
     },
     //function runs when checkout button is pressed
     //no parameters, call an alert that says congrats
     submitCheckoutButton() {
       alert("Purchase successful, thank you for shopping with us")
     },
+    // Dictates cart visibility, turns off when run
     toggleCart() {
-      this.showCart = !this.showCart; // Toggle between cart page and lessons page
-    }
+      // When triggered, changes boolean property cartVisibile to not visible
+    this.cartVisible = !this.cartVisible; 
+    // When triggered (cartVisible is true) if statement will show the cart div
+  },
+  // remove lesson from cart via position in the cart
+  removeFromCart(index, lesson) {
+    this.cart.splice(index, 1); // Splice removes lesson based on position
+    // 1 is delete count, specifying how many to remove
+    lesson.availability++; // Increment spaces back for the lesson
+  }
+
   },
   computed: {
     // function to show number of items in cart
@@ -226,35 +284,56 @@ export default {
     } //fetch for json
   }, // fetch will call our server, 
   created: function () {
-    const that = this; 
-   /**
-    // fetch API call, retrieves response from back end to present to front end
-    fetch("http://localhost:3000/lessons").then(
-      function (response) //function will manage the response
-      { // will get the response and manage it by choosing what to do next
-        response.json().then( // when u have json next function will be executed
-          function (json) { // function to maabeg the son
-            //alert(json);
-            // Will assign to products the json we will load from our server
-            that.lessons = json; // products equal to the json we will recieve
+    const that = this;
+    /**
+     // fetch API call, retrieves response from back end to present to front end
+     fetch("http://localhost:3000/lessons").then(
+       function (response) //function will manage the response
+       { // will get the response and manage it by choosing what to do next
+         response.json().then( // when u have json next function will be executed
+           function (json) { // function to maabeg the son
+             //alert(json);
+             // Will assign to products the json we will load from our server
+             that.lessons = json; // products equal to the json we will recieve
+           }
+         )
+       }
+     ),
+       function () {*/
+    // Fetch API call, retrieves response from Render to present to front end
+    fetch("https://lessons-ecommerce-website-rest-api3.onrender.com/lessons").then(
+      function (response) {
+        response.json().then(
+          function (json) {
+            //alert(json); To show data as an alert
+            //console.log(json); To show data in the console
+            that.lessons = json;
           }
         )
+
       }
     ),
-      function () {*/
-          // Fetch API call, retrieves response from Render to present to front end
-          fetch("https://lessons-ecommerce-website-rest-api3.onrender.com/lessons").then(
-          function (response) {
-            response.json().then(
-              function (json) {
-                //alert(json); To show data as an alert
-                //console.log(json); To show data in the console
-                that.lessons = json;
-              }
-            )
-          }
-        )
-      /**}*/
+      //set the url to your server and route
+      //fetch("http://localhost:3000/collections/products", {
+      fetch("https://lessons-ecommerce-website-rest-api3.onrender.com/lessons", {
+        method: "POST", //set the HTTP method as "POST"
+        headers: {
+          "Content-Type": "application/json", //set the data type as JSON
+        },
+        body: JSON.stringify(this.newLesson) //need to stringify the JSON
+      }).then(
+        function (response) {
+          response.json().then(
+            function (json) {
+              alert("Success: " + json.acknowledged);
+              console.log("Success: " + json.acknowledged);
+              that.lessons.push(this.newLesson);
+            }
+          )
+        }
+      )
+
+    /**}*/
   }
 };
 
@@ -280,16 +359,15 @@ export default {
 </script>
 
 <style>
-
 .lessonDescription {
-font-family: 'Times New Roman', Times, serif;
-font-size: 20x;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 20x;
 }
 
 /*Lesson header*/
 h1 {
-padding: 20px;
-margin-bottom: -20px;
+  padding: 20px;
+  margin-bottom: -20px;
 }
 
 /*Background and text styling*/
@@ -356,7 +434,7 @@ p {
 /*When hovering over lesson item, change background*/
 #Lesson1:hover {
   background-image: url(../public/images/geography.jpg);
-  
+
   color: white;
 }
 
