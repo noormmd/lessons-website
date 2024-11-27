@@ -1,3 +1,4 @@
 node_modules/@ampproject/remapping/package.json
 node_modules/@babel/helper-module-imports/package.json
 node_modules
+dist/
