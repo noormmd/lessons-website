@@ -60,12 +60,29 @@
       <button id="searchButton">Search lessons</button>
     </div>
 
+    <!-- Sorting functionality -->
+<div id="sortOptions">
+  <label for="sortBy">Sort by:</label>
+  <select v-model="sortBy">
+    <option value="subject">Subject</option>
+    <option value="location">Location</option>
+    <option value="price">Price</option>
+    <option value="availability">Availability</option>
+  </select>
+  
+  <label for="sortOrder">Order:</label>
+  <select v-model="sortOrder">
+    <option value="asc">Ascending</option>
+    <option value="desc">Descending</option>
+  </select>
+</div>
+
     <!-- Displaying all lessons using v-for -->
     <div id="Lessons">
       <div id="lessonItems">
-        <!-- Using v-for to loop through lessons array -->
+        <!-- Using v-for to loop through sorted lessons array -->
         <!-- For each lesson in the array create a new div using the id as the key -->
-        <div v-for="lesson in lessons" :key="lesson.id" class="lesson-item">
+        <div v-for="lesson in sortedLessons" :key="lesson.id" class="lesson-item">
 
           <!-- Displaying lesson properties from lesson array -->
           <h3>{{ lesson.subject }}</h3>
@@ -226,15 +243,9 @@ export default {
         availability: 5,
         image: ""
       },
-      newLesson: {
-        lessonId: "",
-        subject: "",
-        location: "",
-        price: 0,
-        description: "",
-        availability: 0,
-        image: ""
-      }
+      sortBy: 'subject',  // Setting the default sorting by 'subject'
+      // Stores the current attribute lessons are sorted by - Defaults to subject
+      sortOrder: 'asc'   // Setting the default order to ascending
     };
   },
 
@@ -249,12 +260,13 @@ export default {
   } else {
     alert("No availability left!");
   }
-    },
+},
+/**
     //function runs when checkout button is pressed
     //no parameters, call an alert that says congrats
     submitCheckoutButton() {
       alert("Purchase successful, thank you for shopping with us")
-    },
+    },*/
     // Dictates cart visibility, turns off when run
     toggleCart() {
       // When triggered, changes boolean property cartVisibile to not visible
@@ -266,9 +278,47 @@ export default {
     this.cart.splice(index, 1); // Splice removes lesson based on position
     // 1 is delete count, specifying how many to remove
     lesson.availability++; // Increment spaces back for the lesson
-  }
-
   },
+        // Function to handle form submission
+  submitCheckoutButton() {
+    // Validation for number, email and required fields using Regex
+    if (!this.order.firstname || !this.order.surname || !this.order.phonenumber || !this.order.email || !this.order.address) {
+      alert("All fields are required.");
+      return;
+    }
+
+    const phoneRegex = /^[0-9]{10}$/;
+    if (!phoneRegex.test(this.order.phonenumber)) {
+      alert("Phone number must be 10 digits.");
+      return;
+    }
+
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    if (!emailRegex.test(this.order.email)) {
+      alert("Invalid email format.");
+      return;
+    }
+
+    // Send data to the backend
+    fetch("https://lessons-ecommerce-website-rest-api3.onrender.com/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        firstname: this.order.firstname,
+        surname: this.order.surname,
+        phonenumber: this.order.phonenumber,
+        email: this.order.email,
+        region: this.order.region,
+        postcode: this.order.postcode,
+        address: this.order.address,
+        lessonIDs: this.cart.map(item => item.lessonId), // Only the lesson IDs from cart
+        numberOfSpaces: this.cart.length, // Assuming spaces = number of items in cart
+      }),
+    })
+      .then((response) => response.json())
+      .then(() => alert(`Order submitted!`))
+  }
+},
   computed: {
     // function to show number of items in cart
     // by returning cart length (number of product ids)
@@ -281,8 +331,34 @@ export default {
       //for each item
       return this.lessons.availability > this.NOfItemsInCart;
       // if (this.cart.length) isEqual (this.lessons.availability)
-    } //fetch for json
-  }, // fetch will call our server, 
+    }, //fetch for json
+   // fetch will call our server
+  sortedLessons() {
+    // Make a copy of the lessons to avoid changing the original array
+    const lessonsCopy = [...this.lessons];
+    
+    // Sort the lessons based on the selected criteria (sortBy) and order (sortOrder)
+    lessonsCopy.sort((a, b) => {
+      // Decide how to compare the lessons based on the selected sort criteria
+      if (this.sortBy === 'price') {
+        return a.price - b.price;  // Sort by price (ascending)
+      } else if (this.sortBy === 'availability') {
+        return a.availability - b.availability;  // Sort by availability (ascending)
+      } else if (this.sortBy === 'subject' || this.sortBy === 'location') {
+        // Sort alphabetically for subject or location
+        return a[this.sortBy].localeCompare(b[this.sortBy]);
+      }
+    });
+
+    // If descending order is selected, reverse the order
+    if (this.sortOrder === 'desc') {
+      lessonsCopy.reverse();
+    }
+
+    // Return the sorted lessons array
+    return lessonsCopy;
+  }
+},
   created: function () {
     const that = this;
     /**
@@ -299,18 +375,21 @@ export default {
          )
        }
      ),
+     
        function () {*/
+
+
+       
     // Fetch API call, retrieves response from Render to present to front end
     fetch("https://lessons-ecommerce-website-rest-api3.onrender.com/lessons").then(
       function (response) {
         response.json().then(
           function (json) {
-            //alert(json); To show data as an alert
-            //console.log(json); To show data in the console
+            alert(json); // To show data as an alert
+            console.log(json); // To show data in the console
             that.lessons = json;
           }
         )
-
       }
     ),
       //set the url to your server and route
@@ -320,18 +399,19 @@ export default {
         headers: {
           "Content-Type": "application/json", //set the data type as JSON
         },
-        body: JSON.stringify(this.newLesson) //need to stringify the JSON
+        body: JSON.stringify(this.lesson) //need to stringify the JSON
       }).then(
         function (response) {
           response.json().then(
             function (json) {
               alert("Success: " + json.acknowledged);
               console.log("Success: " + json.acknowledged);
-              that.lessons.push(this.newLesson);
+              that.lessons.push(this.lesson);
             }
           )
         }
       )
+  
 
     /**}*/
   }
