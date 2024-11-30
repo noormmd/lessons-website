@@ -33,119 +33,21 @@
 
 
 
-<!-- Cart Page -->
+    <!-- Cart Page -->
 
-<!--If statement, if cart visible = true then show div-->
-<div v-if="cartVisible">
- 
- <h2>Shopping Cart</h2>
- <!-- Display lessons -->
- <ul>
-   <li v-for="(lesson, index) in cart" :key="index">
-     {{ lesson.subject }}
-     <button @click="removeFromCart(index, lesson)">Remove</button>
-   </li>
- </ul>
-</div>
+    <!--If statement, if cart visible = true then show div-->
+    <div v-if="cartVisible">
 
-<!-- Shows the cart page if cartVisible is true -->
-<!-- v-else shows the lesson list if otherwise -->
+      <h2>Shopping Cart</h2>
+      <!-- Display lessons -->
+      <ul>
+        <li v-for="(lesson, index) in cart" :key="index">
+          {{ lesson.subject }}
+          <button @click="removeFromCart(index, lesson)">Remove</button>
+        </li>
+      </ul>
 
-<div v-else>
-  <!-- Lesson page / section -->
-
-    <!-- Search functionality via to do list workshop-->
-    <div id="SearchFunctionality">
-      <input type="text" id="searchBar">
-      <button id="searchButton">Search lessons</button>
-    </div>
-
-    <!-- Sorting functionality -->
-<div id="sortOptions">
-  <label for="sortBy">Sort by:</label>
-  <select v-model="sortBy">
-    <option value="subject">Subject</option>
-    <option value="location">Location</option>
-    <option value="price">Price</option>
-    <option value="availability">Availability</option>
-  </select>
-  
-  <label for="sortOrder">Order:</label>
-  <select v-model="sortOrder">
-    <option value="asc">Ascending</option>
-    <option value="desc">Descending</option>
-  </select>
-</div>
-
-    <!-- Displaying all lessons using v-for -->
-    <div id="Lessons">
-      <div id="lessonItems">
-        <!-- Using v-for to loop through sorted lessons array -->
-        <!-- For each lesson in the array create a new div using the id as the key -->
-        <div v-for="lesson in sortedLessons" :key="lesson.id" class="lesson-item">
-
-          <!-- Displaying lesson properties from lesson array -->
-          <h3>{{ lesson.subject }}</h3>
-          <p>Location: {{ lesson.location }}</p>
-          <p>Price: £{{ lesson.price }} per hour</p>
-          <p class="lessonDescription">{{ lesson.description }}</p>
-          <p>Availability: {{ lesson.availability }} spaces</p>
-          <!-- To display individual image from image property using v-bind:src -->
-          <img v-bind:src="lesson.image" alt="Lesson Image" class="lesson-image">
-          <br>
-          <!-- Button to add to cart with Vue event handler, using id -->
-          <!-- When availability is less than or equal to 0 disable button -->
-          <button class="addToCartButton"
-          @click="addToCart(lesson.id)"
-          :disabled="lesson.availability <= 0">
-          
-            <!--Using ternary operator (IF statement TRUE ? option 1 : ELSE option 2)-->
-            <!-- If lesson availability is greater than 0, then show "add to cart" for button, else show "no lessons available"-->
-            {{ lesson.availability > 0 ? "Add to Cart" : "No lessons available" }}
-          </button>
-
-        </div>
-      </div>
-    </div>
-
-    <div id="Lessons">
-      <div id="Lesson1">
-        <h3>Geography</h3>
-        <p>Information: </p>
-        <!--When clicked on, will add 1 lesson id to cart-->
-        <button class="addToCartButton" value="Add to the Cart" @click="addToCart">Add to cart</button>
-        <!-- v-on:click - when button is clicked add to cart function is ran -->
-        <!-- v-show - when isAvailable is true the button will show, otherwise have added too many items to cart -->
-        <!-- v-show="isAvailable -->
-      </div>
-
-      <div id="Lesson2">
-        <h3>English</h3>
-        <p>Information: </p>
-        <button class="addToCartButton" value="Add to the Cart" @click="addToCart">Add to cart</button>
-      </div>
-
-      <div id="Lesson3">
-        <h3>Maths</h3>
-        <p>Information: {{ lessons.description }}</p>
-        <!-- <button class="addToCartButton" value="Add to the Cart" v-if="isAvailable" @click="addToCart">Add to
-          cart</button> -->
-        <!-- Performs v-on and calls the addToCart function when button is clicked -->
-        <!-- passing the lesson as an argument -->
-        <button class="addToCartButton" @click="addToCart(lesson)" :disabled="lesson.availability <= 0">
-          <!-- Dynamically binds the disabled attribute -->
-          {{ lesson.availability > 0 ? "Add to Cart" : "No lessons available" }}
-        </button>
-        <!-- If spaces is greater, then 0 then display add to cart otherwise no lessons available-->
-        <!-- Disables button when the spaces property of the lesson is <= 0 -->
-      </div>
-    </div>
-
-    </div> <!--End of v-else display lessons div section-->
-  </main>
-  
-
-  <!-- Checkout/cart section which will be shown after cart is clicked -->
+      <!-- Checkout/cart section which will be shown after cart is clicked -->
   <h2>Welcome to Checkout</h2>
   <p><!--Binding name with v-model-->
     First name:
@@ -206,8 +108,72 @@ Radio gives the choices, if above is seleted as true, like home or business addr
 <p><input type="radio" id="home" value="Home" v-model="order.method"></p>
 Can select default options in order with 'home' for method and false properties for gift
 -->
-</template>
+    </div>
 
+    <!-- Shows the cart page if cartVisible is true -->
+    <!-- v-else shows the lesson list if otherwise -->
+
+    <div v-else>
+      <!-- Lesson page / section -->
+
+      <!-- Search functionality via to do list workshop-->
+      <div id="SearchFunctionality">
+        <input type="text" id="searchBar">
+        <button id="searchButton">Search lessons</button>
+      </div>
+
+      <!-- Sorting functionality -->
+      <div id="sortOptions">
+        <label for="sortBy">Sort by:</label>
+        <select v-model="sortBy">
+          <option value="subject">Subject</option>
+          <option value="location">Location</option>
+          <option value="price">Price</option>
+          <option value="availability">Availability</option>
+        </select>
+
+        <label for="sortOrder">Order:</label>
+        <select v-model="sortOrder">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </div>
+
+      <!-- Displaying all lessons using v-for -->
+      <div id="Lessons">
+        <div id="lessonItems">
+          <!-- Using v-for to loop through sorted lessons array -->
+          <!-- For each lesson in the array create a new div using the id as the key -->
+          <div v-for="lesson in sortedLessons" :key="lesson.id" class="lesson-item">
+
+            <!-- Displaying lesson properties from lesson array -->
+            <h3>{{ lesson.subject }}</h3>
+            <p>Location: {{ lesson.location }}</p>
+            <p>Price: £{{ lesson.price }} per hour</p>
+            <p class="lessonDescription">{{ lesson.description }}</p>
+            <p>Availability: {{ lesson.availability }} spaces</p>
+            <!-- To display individual image from image property using v-bind:src -->
+            <img v-bind:src="lesson.image" alt="Lesson Image" class="lesson-image">
+            <br>
+
+           <!--Button to add to cart with Vue event handler, using id 
+           When availability is less than or equal to 0 disable button.
+         Using ternary operator (IF statement TRUE(?) option 1 ELSE(:) option 2)
+             If lesson availability is less than 1, then show "add to cart" for button, else show "no lessons available"-->
+            <button class="addToCartButton"
+            @click="addToCart(lesson)"
+            :disabled="lesson.availability < 1">
+              {{ lesson.availability > 0 ? "Add to Cart" : "No spaces available" }}
+            </button>
+
+          </div>
+        </div>
+      </div>
+    </div> <!--End of v-else display lessons div section-->
+
+  </main>
+
+  </template>
 <script>
 // Vue js instance
 //import { ref } from 'vue';
@@ -253,72 +219,82 @@ export default {
     // Function to push the lesson into cart
     // define which lesson
     addToCart(lesson) {
-     if (lesson.availability > 0) {
-    this.cart.push(lesson); // Add the lesson to the cart
-    lesson.availability--;  // Decrement availability by 1
-    alert(`Added to cart. Remaining availability: ${lesson.availability}`);
-  } else {
-    alert("No availability left!");
-  }
-},
-/**
-    //function runs when checkout button is pressed
-    //no parameters, call an alert that says congrats
-    submitCheckoutButton() {
-      alert("Purchase successful, thank you for shopping with us")
-    },*/
+      if (lesson.availability > 0) {
+        // Add lesson to cart by copying lesson object
+        this.cart.push({ ...lesson }); // Spread the lesson object to create a copy in the cart
+        // Decrement availability by 1 both in the lessons list and cart
+        lesson.availability--;
+
+        // Return successful message and amount left
+        alert(`Successfully added lesson to cart. Remaining left: ${lesson.availability}`);
+      } else {
+        alert("No lessons available");
+      }
+    },
+    /**
+        //function runs when checkout button is pressed
+        //no parameters, call an alert that says congrats
+        submitCheckoutButton() {
+          alert("Purchase successful, thank you for shopping with us")
+        },*/
     // Dictates cart visibility, turns off when run
     toggleCart() {
       // When triggered, changes boolean property cartVisibile to not visible
-    this.cartVisible = !this.cartVisible; 
-    // When triggered (cartVisible is true) if statement will show the cart div
+      this.cartVisible = !this.cartVisible;
+      // When triggered (cartVisible is true) if statement will show the cart div
+    },
+    // remove lesson from cart via position in the cart
+    removeFromCart(index, lesson) {
+      this.cart.splice(index, 1); // Splice removes lesson based on position
+      // 1 is delete count, specifying how many to remove
+
+      // To increment spaces back for the lesson:
+      // Find the lesson in the original lessons list
+      const originalLesson = this.lessons.find(l => l.id === lesson.id);
+      if (originalLesson) {
+        originalLesson.availability++; // Restore the availability
+      }
+    },
+    // Function to handle form submission
+    submitCheckoutButton() {
+      // Validation for number, email and required fields using Regex
+      if (!this.order.firstname || !this.order.surname || !this.order.phonenumber || !this.order.email || !this.order.address) {
+        alert("All fields are required.");
+        return;
+      }
+
+      const phoneRegex = /^[0-9]{10}$/;
+      if (!phoneRegex.test(this.order.phonenumber)) {
+        alert("Phone number must be 10 digits.");
+        return;
+      }
+
+      const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+      if (!emailRegex.test(this.order.email)) {
+        alert("Invalid email format.");
+        return;
+      }
+
+      // Send data to the backend
+      fetch("https://lessons-ecommerce-website-rest-api3.onrender.com/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstname: this.order.firstname,
+          surname: this.order.surname,
+          phonenumber: this.order.phonenumber,
+          email: this.order.email,
+          region: this.order.region,
+          postcode: this.order.postcode,
+          address: this.order.address,
+          lessonIDs: this.cart.map(item => item.lessonId), // Only the lesson IDs from cart
+          numberOfSpaces: this.cart.length, // Assuming spaces = number of items in cart
+        }),
+      })
+        .then((response) => response.json())
+        .then(() => alert(`Order submitted!`))
+    }
   },
-  // remove lesson from cart via position in the cart
-  removeFromCart(index, lesson) {
-    this.cart.splice(index, 1); // Splice removes lesson based on position
-    // 1 is delete count, specifying how many to remove
-    lesson.availability++; // Increment spaces back for the lesson
-  },
-        // Function to handle form submission
-  submitCheckoutButton() {
-    // Validation for number, email and required fields using Regex
-    if (!this.order.firstname || !this.order.surname || !this.order.phonenumber || !this.order.email || !this.order.address) {
-      alert("All fields are required.");
-      return;
-    }
-
-    const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(this.order.phonenumber)) {
-      alert("Phone number must be 10 digits.");
-      return;
-    }
-
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-    if (!emailRegex.test(this.order.email)) {
-      alert("Invalid email format.");
-      return;
-    }
-
-    // Send data to the backend
-    fetch("https://lessons-ecommerce-website-rest-api3.onrender.com/orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        firstname: this.order.firstname,
-        surname: this.order.surname,
-        phonenumber: this.order.phonenumber,
-        email: this.order.email,
-        region: this.order.region,
-        postcode: this.order.postcode,
-        address: this.order.address,
-        lessonIDs: this.cart.map(item => item.lessonId), // Only the lesson IDs from cart
-        numberOfSpaces: this.cart.length, // Assuming spaces = number of items in cart
-      }),
-    })
-      .then((response) => response.json())
-      .then(() => alert(`Order submitted!`))
-  }
-},
   computed: {
     // function to show number of items in cart
     // by returning cart length (number of product ids)
@@ -331,34 +307,34 @@ export default {
       //for each item
       return this.lessons.availability > this.NOfItemsInCart;
       // if (this.cart.length) isEqual (this.lessons.availability)
-    }, //fetch for json
-   // fetch will call our server
-  sortedLessons() {
-    // Make a copy of the lessons to avoid changing the original array
-    const lessonsCopy = [...this.lessons];
-    
-    // Sort the lessons based on the selected criteria (sortBy) and order (sortOrder)
-    lessonsCopy.sort((a, b) => {
-      // Decide how to compare the lessons based on the selected sort criteria
-      if (this.sortBy === 'price') {
-        return a.price - b.price;  // Sort by price (ascending)
-      } else if (this.sortBy === 'availability') {
-        return a.availability - b.availability;  // Sort by availability (ascending)
-      } else if (this.sortBy === 'subject' || this.sortBy === 'location') {
-        // Sort alphabetically for subject or location
-        return a[this.sortBy].localeCompare(b[this.sortBy]);
+    }, //fetch for json, fetch will call our server
+    // Sorting functionality
+    sortedLessons() {
+      // Make a copy of the lessons to avoid changing the original array
+      const lessonsCopy = [...this.lessons]; // making a copy via spread operator
+
+      // Sort the lessons based on the selected criteria (sortBy) and order (sortOrder)
+      lessonsCopy.sort((a, b) => {
+        // If statement based on what user picked, decide how to compare the lessons based on selected sort criteria
+        if (this.sortBy === 'price') {
+          return a.price - b.price;  // Sort by price (ascending)
+        } else if (this.sortBy === 'availability') {
+          return a.availability - b.availability;  // Sort by availability (ascending)
+        } else if (this.sortBy === 'subject' || this.sortBy === 'location') {
+          // Sort alphabetically for subject or location
+          return a[this.sortBy].localeCompare(b[this.sortBy]);
+        }
+      });
+
+      // If descending order is selected, reverse the order
+      if (this.sortOrder === 'desc') {
+        lessonsCopy.reverse();
       }
-    });
 
-    // If descending order is selected, reverse the order
-    if (this.sortOrder === 'desc') {
-      lessonsCopy.reverse();
+      // Return the sorted lessons array
+      return lessonsCopy;
     }
-
-    // Return the sorted lessons array
-    return lessonsCopy;
-  }
-},
+  },
   created: function () {
     const that = this;
     /**
@@ -378,8 +354,6 @@ export default {
      
        function () {*/
 
-
-       
     // Fetch API call, retrieves response from Render to present to front end
     fetch("https://lessons-ecommerce-website-rest-api3.onrender.com/lessons").then(
       function (response) {
@@ -391,9 +365,8 @@ export default {
           }
         )
       }
-    ),
+    )/** ,
       //set the url to your server and route
-      //fetch("http://localhost:3000/collections/products", {
       fetch("https://lessons-ecommerce-website-rest-api3.onrender.com/lessons", {
         method: "POST", //set the HTTP method as "POST"
         headers: {
@@ -411,7 +384,7 @@ export default {
           )
         }
       )
-  
+  */
 
     /**}*/
   }
@@ -461,7 +434,6 @@ h1 {
   font-family: 'Fraunces';
   font-size: 22px;
   /**font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;*/
-  /** To make website fit page */
 }
 
 p {
