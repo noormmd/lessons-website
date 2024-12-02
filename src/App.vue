@@ -48,51 +48,75 @@
       </ul>
 
       <!-- Checkout/cart section which will be shown after cart is clicked -->
-  <h2>Welcome to Checkout</h2>
-  <p><!--Binding name with v-model-->
-    First name:
-  </p>
-  <input type="text" v-model="order.firstname">
-  <!--V-model- Gets sent to order.name, binding element with order.name-->
+      <h2>Welcome to Checkout</h2>
 
-  <p>Surname:</p>
-  <input type="text" v-model="order.surname">
+      <!--Binding name with v-model-->
+      <p>
+        First name:
+        <input type="text" v-model="order.firstname" @input="validateName" placeholder="Enter your name" />
+      </p>
+      <!--V-model- Gets sent to order.name, binding element with order.firstname-->
 
-  <p>Phone number:</p>
-  <input type="text" v-model="order.phonenumber">
+      <p>
+        Surname:
+        <input type="text" v-model="order.surname" @input="validateName" placeholder="Enter your name" />
 
-  <p>Email:</p>
-  <input type="text" v-model="order.email">
+        <!-- Show error if name is invalid -->
+        <span v-if="order.firstname && !isNameValid" style="color: red;">
+          Name must contain letters only.
+        </span>
+      </p>
 
-  <!--Select button using v-model-->
-  <p>Select region</p>
-  <select v-model="order.region">
-    <option disabled>Select Region</option>
-    <option v-bind:value="order.region">Europe</option>
-    <option v-bind:value="order.region">USA</option>
-    <option v-bind:value="order.region">Asia</option>
-    <option v-bind:value="order.region">Middle East</option>
-    <option v-bind:value="order.region">Africa</option>
-  </select>
+      <p>
+        Phone Number:
+        <input type="text" v-model="order.phonenumber" @input="validatePhone" placeholder="Enter your phone number" />
 
-  <p>Zip/Postcode:</p>
-  <input type="text" v-model="order.postcode">
 
-  <p>Address:</p>
-  <input type="text" v-model="order.address">
-  <!--Button for checking out-->
-  <button v-on:click="submitCheckoutButton">Place Order</button>
+        <!-- Show error if phone number is invalid -->
+        <span v-if="order.phonenumber && !isPhoneValid" style="color: red;">
+          Phone number must contain numbers only.
+        </span>
+      </p>
 
-  <h2> Order Information </h2>
-  <p>Name: {{ order.firstname }}</p>
-  <p>Surname: {{ order.surname }}</p>
-  <p>Phone number: {{ order.phonenumber }}</p>
-  <p>Email: {{ order.email }}</p>
-  <p>Region: {{ order.region }}</p>
-  <p>Zip/Postcode: {{ order.postcode }}</p>
-  <p>Deliver to address: {{ order.address }}</p>
-  {{ order.lesson }}
-  <!--
+      <p>Email:</p>
+      <input type="text" v-model="order.email">
+
+      <!--Select button using v-model-->
+      <p>Select region</p>
+      <select v-model="order.region">
+        <option disabled>Select Region</option>
+        <option v-bind:value="order.region">Europe</option>
+        <option v-bind:value="order.region">USA</option>
+        <option v-bind:value="order.region">Asia</option>
+        <option v-bind:value="order.region">Middle East</option>
+        <option v-bind:value="order.region">Africa</option>
+      </select>
+
+      <p>Zip/Postcode:</p>
+      <input type="text" v-model="order.postcode">
+
+      <p>Address:</p>
+      <input type="text" v-model="order.address">
+      <!--Button for checking out-->
+      <button :disabled="!isFormValid" v-on:click="submitCheckoutButton2">Place Order</button>
+
+  <!-- Read order information back to user-->
+      <h2> Order Information </h2>
+      <p>Name: {{ order.firstname }}</p>
+      <p>Surname: {{ order.surname }}</p>
+      <p>Phone number: {{ order.phonenumber }}</p>
+      <p>Email: {{ order.email }}</p>
+      <p>Region: {{ order.region }}</p>
+      <p>Zip/Postcode: {{ order.postcode }}</p>
+      <p>Deliver to address: {{ order.address }}</p>
+      {{ order.lesson }}
+
+      <!-- Button is disabled by default until valid inputs are provided -->
+      <button :disabled="!isFormValid" @click="submitCheckoutButton">
+        Checkout
+      </button> 
+      
+      <!--
 using v-for without key
 If you don't need key
 <ol>
@@ -100,7 +124,7 @@ If you don't need key
 </ol>
 -->
 
-  <!-- Checkbox and Radio buttons for method.order
+      <!-- Checkbox and Radio buttons for method.order
 <p><input type="checkbox" id="gift" value="true" v-model="order.gift">
 <label for="gift">Ship As Gift?</label></p>
 
@@ -156,13 +180,11 @@ Can select default options in order with 'home' for method and false properties 
             <img v-bind:src="lesson.image" alt="Lesson Image" class="lesson-image">
             <br>
 
-           <!--Button to add to cart with Vue event handler, using id 
+            <!--Button to add to cart with Vue event handler, using id 
            When availability is less than or equal to 0 disable button.
          Using ternary operator (IF statement TRUE(?) option 1 ELSE(:) option 2)
              If lesson availability is less than 1, then show "add to cart" for button, else show "no lessons available"-->
-            <button class="addToCartButton"
-            @click="addToCart(lesson)"
-            :disabled="lesson.availability < 1">
+            <button class="addToCartButton" @click="addToCart(lesson)" :disabled="lesson.availability < 1">
               {{ lesson.availability > 0 ? "Add to Cart" : "No spaces available" }}
             </button>
 
@@ -173,7 +195,7 @@ Can select default options in order with 'home' for method and false properties 
 
   </main>
 
-  </template>
+</template>
 <script>
 // Vue js instance
 //import { ref } from 'vue';
@@ -209,6 +231,9 @@ export default {
         availability: 5,
         image: ""
       },
+      // Set to false by default so regex can be complicated before button gets enabled
+      isNameValid: false,
+      isPhoneValid: false,
       sortBy: 'subject',  // Setting the default sorting by 'subject'
       // Stores the current attribute lessons are sorted by - Defaults to subject
       sortOrder: 'asc'   // Setting the default order to ascending
@@ -216,6 +241,29 @@ export default {
   },
 
   methods: {
+    // Validate that the name contains only letters
+    validateName() {
+      const nameRegex = /^[A-Za-z\s]+$/;
+      this.isNameValid = nameRegex.test(this.order.firstname);
+      this.isNameValid = nameRegex.test(this.order.surname);
+    },
+    // Validate that the phone number contains only numbers
+    validatePhone() {
+      const phoneRegex = /^[0-9]+$/;
+      this.isPhoneValid = phoneRegex.test(this.order.phonenumber);
+    },
+    submitCheckoutButton() {
+      alert("Purchase successful, thank you for shopping with us")
+      this.cart = []; // Clear the cart after submission
+      this.order = {
+        firstname: "", surname: "", phonenumber: "",
+        email: "",
+        region: "",
+        postcode: "",
+        address: "",
+        lessonid: ""
+      };// Reset order fields
+    },
     // Function to push the lesson into cart
     // define which lesson
     addToCart(lesson) {
@@ -231,12 +279,6 @@ export default {
         alert("No lessons available");
       }
     },
-    /**
-        //function runs when checkout button is pressed
-        //no parameters, call an alert that says congrats
-        submitCheckoutButton() {
-          alert("Purchase successful, thank you for shopping with us")
-        },*/
     // Dictates cart visibility, turns off when run
     toggleCart() {
       // When triggered, changes boolean property cartVisibile to not visible
@@ -255,13 +297,20 @@ export default {
         originalLesson.availability++; // Restore the availability
       }
     },
+
     // Function to handle form submission
-    submitCheckoutButton() {
+    submitCheckoutButton2() {
       // Validation for number, email and required fields using Regex
       if (!this.order.firstname || !this.order.surname || !this.order.phonenumber || !this.order.email || !this.order.address) {
         alert("All fields are required.");
         return;
       }
+
+ const nameRegex = /^[A-Za-z\s]+$/;
+      {
+      this.isNameValid = nameRegex.test(this.order.firstname);
+      //this.isNameValid = nameRegex.test(this.order.surname);
+    }
 
       const phoneRegex = /^[0-9]{10}$/;
       if (!phoneRegex.test(this.order.phonenumber)) {
@@ -288,84 +337,88 @@ export default {
           postcode: this.order.postcode,
           address: this.order.address,
           lessonIDs: this.cart.map(item => item.lessonId), // Only the lesson IDs from cart
-          numberOfSpaces: this.cart.length, // Assuming spaces = number of items in cart
+          numberOfSpaces: this.cart.length, // Spaces = number of items in cart
         }),
       })
         .then((response) => response.json())
         .then(() => alert(`Order submitted!`))
     }
   },
-  computed: {
-    // function to show number of items in cart
-    // by returning cart length (number of product ids)
-    NOfItemsInCart() {
-      return this.cart.length;
-    },
-    //total elements available in inventory are more than elements added to cart 
-    isAvailable() {
-      // when total number of available elements have been added, button will be disabled
-      //for each item
-      return this.lessons.availability > this.NOfItemsInCart;
-      // if (this.cart.length) isEqual (this.lessons.availability)
-    }, //fetch for json, fetch will call our server
-    // Sorting functionality
-    sortedLessons() {
-      // Make a copy of the lessons to avoid changing the original array
-      const lessonsCopy = [...this.lessons]; // making a copy via spread operator
+    computed: {
+      // Enable the button only when both fields are valid
+      isFormValid() {
+        return this.isNameValid && this.isPhoneValid;
+      },
+      // function to show number of items in cart
+      // by returning cart length (number of product ids)
+      NOfItemsInCart() {
+        return this.cart.length;
+      },
+      //total elements available in inventory are more than elements added to cart 
+      isAvailable() {
+        // when total number of available elements have been added, button will be disabled
+        //for each item
+        return this.lessons.availability > this.NOfItemsInCart;
+        // if (this.cart.length) isEqual (this.lessons.availability)
+      }, //fetch for json, fetch will call our server
+      // Sorting functionality
+      sortedLessons() {
+        // Make a copy of the lessons to avoid changing the original array
+        const lessonsCopy = [...this.lessons]; // making a copy via spread operator
 
-      // Sort the lessons based on the selected criteria (sortBy) and order (sortOrder)
-      lessonsCopy.sort((a, b) => {
-        // If statement based on what user picked, decide how to compare the lessons based on selected sort criteria
-        if (this.sortBy === 'price') {
-          return a.price - b.price;  // Sort by price (ascending)
-        } else if (this.sortBy === 'availability') {
-          return a.availability - b.availability;  // Sort by availability (ascending)
-        } else if (this.sortBy === 'subject' || this.sortBy === 'location') {
-          // Sort alphabetically for subject or location
-          return a[this.sortBy].localeCompare(b[this.sortBy]);
-        }
-      });
-
-      // If descending order is selected, reverse the order
-      if (this.sortOrder === 'desc') {
-        lessonsCopy.reverse();
-      }
-
-      // Return the sorted lessons array
-      return lessonsCopy;
-    }
-  },
-  created: function () {
-    const that = this;
-    /**
-     // fetch API call, retrieves response from back end to present to front end
-     fetch("http://localhost:3000/lessons").then(
-       function (response) //function will manage the response
-       { // will get the response and manage it by choosing what to do next
-         response.json().then( // when u have json next function will be executed
-           function (json) { // function to maabeg the son
-             //alert(json);
-             // Will assign to products the json we will load from our server
-             that.lessons = json; // products equal to the json we will recieve
-           }
-         )
-       }
-     ),
-     
-       function () {*/
-
-    // Fetch API call, retrieves response from Render to present to front end
-    fetch("https://lessons-ecommerce-website-rest-api3.onrender.com/lessons").then(
-      function (response) {
-        response.json().then(
-          function (json) {
-            alert(json); // To show data as an alert
-            console.log(json); // To show data in the console
-            that.lessons = json;
+        // Sort the lessons based on the selected criteria (sortBy) and order (sortOrder)
+        lessonsCopy.sort((a, b) => {
+          // If statement based on what user picked, decide how to compare the lessons based on selected sort criteria
+          if (this.sortBy === 'price') {
+            return a.price - b.price;  // Sort by price (ascending)
+          } else if (this.sortBy === 'availability') {
+            return a.availability - b.availability;  // Sort by availability (ascending)
+          } else if (this.sortBy === 'subject' || this.sortBy === 'location') {
+            // Sort alphabetically for subject or location
+            return a[this.sortBy].localeCompare(b[this.sortBy]);
           }
-        )
+        });
+
+        // If descending order is selected, reverse the order
+        if (this.sortOrder === 'desc') {
+          lessonsCopy.reverse();
+        }
+
+        // Return the sorted lessons array
+        return lessonsCopy;
       }
-    )/** ,
+    },
+    created: function () {
+      const that = this;
+      /**
+       // fetch API call, retrieves response from back end to present to front end
+       fetch("http://localhost:3000/lessons").then(
+         function (response) //function will manage the response
+         { // will get the response and manage it by choosing what to do next
+           response.json().then( // when u have json next function will be executed
+             function (json) { // function to maabeg the son
+               //alert(json);
+               // Will assign to products the json we will load from our server
+               that.lessons = json; // products equal to the json we will recieve
+             }
+           )
+         }
+       ),
+       
+         function () {*/
+
+      // Fetch API call, retrieves response from Render to present to front end
+      fetch("https://lessons-ecommerce-website-rest-api3.onrender.com/lessons").then(
+        function (response) {
+          response.json().then(
+            function (json) {
+              alert(json); // To show data as an alert
+              console.log(json); // To show data in the console
+              that.lessons = json;
+            }
+          )
+        }
+      )/** ,
       //set the url to your server and route
       fetch("https://lessons-ecommerce-website-rest-api3.onrender.com/lessons", {
         method: "POST", //set the HTTP method as "POST"
@@ -386,9 +439,9 @@ export default {
       )
   */
 
-    /**}*/
+    }
   }
-};
+
 
 /** 
 // Functionality to show specific sections after hiding the mainPage section
