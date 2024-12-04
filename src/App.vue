@@ -81,7 +81,7 @@
       <p>Email:</p>
       <input type="text" v-model="order.email">
 
-      <!--Select button using v-model-->
+      <!--    Select button using v-model
       <p>Select region</p>
       <select v-model="order.region">
         <option disabled>Select Region</option>
@@ -90,7 +90,7 @@
         <option v-bind:value="order.region">Asia</option>
         <option v-bind:value="order.region">Middle East</option>
         <option v-bind:value="order.region">Africa</option>
-      </select>
+      </select>-->
 
       <p>Zip/Postcode:</p>
       <input type="text" v-model="order.postcode">
@@ -106,7 +106,7 @@
       <p>Surname: {{ order.surname }}</p>
       <p>Phone number: {{ order.phonenumber }}</p>
       <p>Email: {{ order.email }}</p>
-      <p>Region: {{ order.region }}</p>
+    <!-- <p>Region: {{ order.region }}</p>-->
       <p>Zip/Postcode: {{ order.postcode }}</p>
       <p>Deliver to address: {{ order.address }}</p>
       {{ order.lesson }}
@@ -217,7 +217,6 @@ export default {
         surname: "",
         phonenumber: "",
         email: "",
-        region: "",
         postcode: "",
         address: "",
         lessonid: ""
@@ -258,7 +257,6 @@ export default {
       this.order = {
         firstname: "", surname: "", phonenumber: "",
         email: "",
-        region: "",
         postcode: "",
         address: "",
         lessonid: ""
@@ -297,7 +295,76 @@ export default {
         originalLesson.availability++; // Restore the availability
       }
     },
+    submitCheckoutButton2() {
+  // Basic validation
+  if (!this.order.firstname || !this.order.surname || !this.order.phonenumber || !this.order.email || !this.order.address) {
+    alert("All fields are required.");
+    return;
+  }
 
+  const phoneRegex = /^[0-9]{10}$/;
+  if (!phoneRegex.test(this.order.phonenumber)) {
+    alert("Phone number must be 10 digits.");
+    return;
+  }
+
+  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+  if (!emailRegex.test(this.order.email)) {
+    alert("Invalid email format.");
+    return;
+  }
+
+  // Prepare the payload
+  const payload = {
+    firstname: this.order.firstname,
+    surname: this.order.surname,
+    phonenumber: this.order.phonenumber,
+    email: this.order.email,
+    postcode: this.order.postcode,
+    address: this.order.address,
+    lessonIDs: this.cart.map(item => item._id || item.lessonId), // Handle both _id and lessonId
+    numberOfSpaces: this.cart.length,
+  };
+
+  // Debugging payload
+  console.log("Submitting order with payload:", payload);
+
+  // Send data to the backend
+  fetch("https://lessons-ecommerce-website-rest-api3.onrender.com/orders", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      console.log("Order submission response:", data);
+      alert("Order submitted successfully!");
+
+      // Clear the cart and reset the form
+      this.cart = [];
+      this.order = {
+        firstname: "",
+        surname: "",
+        phonenumber: "",
+        email: "",
+        postcode: "",
+        address: "",
+        lessonid: "",
+      };
+    })
+    .catch((error) => {
+      console.error("Error submitting order:", error);
+      alert("Failed to submit the order. Please try again later.");
+    });
+}
+
+
+/**
     // Function to handle form submission
     submitCheckoutButton2() {
       // Validation for number, email and required fields using Regex
@@ -333,7 +400,7 @@ export default {
           surname: this.order.surname,
           phonenumber: this.order.phonenumber,
           email: this.order.email,
-          region: this.order.region,
+         // region: this.order.region,
           postcode: this.order.postcode,
           address: this.order.address,
           lessonIDs: this.cart.map(item => item.lessonId), // Only the lesson IDs from cart
@@ -342,7 +409,7 @@ export default {
       })
         .then((response) => response.json())
         .then(() => alert(`Order submitted!`))
-    }
+    }*/
   },
     computed: {
       // Enable the button only when both fields are valid
