@@ -21,9 +21,10 @@
   <main>
 
     <!--Cart button-->
-    <!-- Toggles cart visibility function when clicked
-  disables when cart length is absolute 0 -->
-    <a id="cart" @click="toggleCart" :disabled="cart.length === 0">
+    <!-- If statement, if n of items in cart (cart length) are 0 then do nothing otherwise turn cart on
+    toggleCart=Toggles cart visibility function when clicked -->
+    <a id="cart"
+    @click="toggleCart" :class="{ disabled: cart.length < 1 }">
       <img alt="Cart" id="carticon" src="../public/images/cart-icon.png">
       <!--Displays number of items-->
       {{ NOfItemsInCart }}
@@ -97,9 +98,7 @@
 
       <p>Address:</p>
       <input type="text" v-model="order.address">
-      <!--Button for checking out-->
-      <button :disabled="!isFormValid" v-on:click="submitCheckoutButton2">Place Order</button>
-
+      
   <!-- Read order information back to user-->
       <h2> Order Information </h2>
       <p>Name: {{ order.firstname }}</p>
@@ -111,32 +110,18 @@
       <p>Deliver to address: {{ order.address }}</p>
       {{ order.lesson }}
 
+      <!--Button for checking out-->
+      <button :disabled="!isFormValid" v-on:click="submitCheckoutButton">Place Order</button>
+
+
       <!-- Button is disabled by default until valid inputs are provided -->
-      <button :disabled="!isFormValid" @click="submitCheckoutButton">
+      <!--<button :disabled="!isFormValid" @click="submitCheckoutButton">
         Checkout
-      </button> 
-      
-      <!--
-using v-for without key
-If you don't need key
-<ol>
-  <li v-for="lesson in lessonCategories">{{lesson}}</li>
-</ol>
--->
-
-      <!-- Checkbox and Radio buttons for method.order
-<p><input type="checkbox" id="gift" value="true" v-model="order.gift">
-<label for="gift">Ship As Gift?</label></p>
-
-Radio gives the choices, if above is seleted as true, like home or business address
-<p><input type="radio" id="home" value="Home" v-model="order.method"></p>
-Can select default options in order with 'home' for method and false properties for gift
--->
+      </button> -->
     </div>
 
     <!-- Shows the cart page if cartVisible is true -->
     <!-- v-else shows the lesson list if otherwise -->
-
     <div v-else>
       <!-- Lesson page / section -->
 
@@ -198,8 +183,6 @@ Can select default options in order with 'home' for method and false properties 
 </template>
 <script>
 // Vue js instance
-//import { ref } from 'vue';
-
 export default {
   name: 'App',
   components: {
@@ -251,6 +234,7 @@ export default {
       const phoneRegex = /^[0-9]+$/;
       this.isPhoneValid = phoneRegex.test(this.order.phonenumber);
     },
+    /**
     submitCheckoutButton() {
       alert("Purchase successful, thank you for shopping with us")
       this.cart = []; // Clear the cart after submission
@@ -261,7 +245,7 @@ export default {
         address: "",
         lessonid: ""
       };// Reset order fields
-    },
+    },*/
     // Function to push the lesson into cart
     // define which lesson
     addToCart(lesson) {
@@ -277,11 +261,17 @@ export default {
         alert("No lessons available");
       }
     },
-    // Dictates cart visibility, turns off when run
+    // Dictates cart accessibility, when cart quantity is under 0,
+    // stops ability to access cart section div
+
+    // When triggered (cartVisible is true) if statement will show the cart div
     toggleCart() {
+      if (this.NOfItemsInCart > 0) { // If length of cart is greater than 0
       // When triggered, changes boolean property cartVisibile to not visible
-      this.cartVisible = !this.cartVisible;
-      // When triggered (cartVisible is true) if statement will show the cart div
+      this.cartVisible = !this.cartVisible; // cartVisible=either shows cart / checkout section div or hides it
+    } else {
+      alert('No items in cart to view. Please add to cart before you continue'); // Else give error message
+    }
     },
     // remove lesson from cart via position in the cart
     removeFromCart(index, lesson) {
@@ -295,6 +285,85 @@ export default {
         originalLesson.availability++; // Restore the availability
       }
     },
+    submitCheckoutButton() {
+
+       // Define regular expressions
+  const nameRegex = /^[A-Za-z]+$/; // Letters only
+  const phoneRegex = /^[0-9]+$/;  // Numbers only
+
+  // Validate first name
+  if (!nameRegex.test(this.order.firstname)) {
+    alert("Name must contain letters only.");
+    return;
+  }
+
+   // Validate surname fields
+   if (!nameRegex.test(this.order.surname)) {
+    alert("Name must contain letters only.");
+    return;
+  }
+
+  // Validate phone number
+  if (!phoneRegex.test(this.order.phonenumber)) {
+    alert("Phone must contain numbers only.");
+    return;
+  }
+
+  // Validate the form fields
+  if (!this.order.firstname || !this.order.surname || !this.order.phonenumber || !this.order.email || !this.order.address) {
+    alert("Please fill out all required fields.");
+    return;
+  }
+
+  // Prepare the payload for the backend
+  const payload = {
+    firstname: this.order.firstname,
+    surname: this.order.surname,
+    phonenumber: this.order.phonenumber,
+    email: this.order.email,
+    postcode: this.order.postcode,
+    address: this.order.address,
+    lessonIDs: this.cart.map(item => item._id || item.lessonId), // Send lesson IDs only
+  };
+
+  // Send the order to the backend
+  fetch("https://lessons-ecommerce-website-rest-api3.onrender.com/orders", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload), // Convert the payload to JSON
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to submit order. Please try again.");
+      }
+      return response.json();
+    })
+    .then((data) => {
+      alert("Order placed successfully!");
+      console.log("Order response:", data);
+
+      // Clear the cart and reset the order form
+      this.cart = [];
+      this.order = {
+        firstname: "",
+        surname: "",
+        phonenumber: "",
+        email: "",
+        postcode: "",
+        address: "",
+        lessonid: "",
+      };
+    })
+    .catch((error) => {
+      console.error("Error submitting order:", error);
+      alert("There was a problem placing your order. Please try again.");
+    });
+}
+
+
+    /**
     submitCheckoutButton2() {
   // Basic validation
   if (!this.order.firstname || !this.order.surname || !this.order.phonenumber || !this.order.email || !this.order.address) {
@@ -362,7 +431,7 @@ export default {
       alert("Failed to submit the order. Please try again later.");
     });
 }
-
+*/
 
 /**
     // Function to handle form submission
@@ -414,7 +483,11 @@ export default {
     computed: {
       // Enable the button only when both fields are valid
       isFormValid() {
-        return this.isNameValid && this.isPhoneValid;
+        const nameRegex = /^[A-Za-z]+$/; // Letters only
+    const phoneRegex = /^[0-9]+$/;  // Numbers only
+    return nameRegex.test(this.order.firstname) && nameRegex.test(this.order.surname) && phoneRegex.test(this.order.phonenumber);
+
+        //return this.isNameValid && this.isPhoneValid;
       },
       // function to show number of items in cart
       // by returning cart length (number of product ids)
@@ -457,78 +530,24 @@ export default {
     },
     created: function () {
       const that = this;
-      /**
-       // fetch API call, retrieves response from back end to present to front end
-       fetch("http://localhost:3000/lessons").then(
-         function (response) //function will manage the response
-         { // will get the response and manage it by choosing what to do next
-           response.json().then( // when u have json next function will be executed
-             function (json) { // function to maabeg the son
-               //alert(json);
-               // Will assign to products the json we will load from our server
-               that.lessons = json; // products equal to the json we will recieve
-             }
-           )
-         }
-       ),
-       
-         function () {*/
-
       // Fetch API call, retrieves response from Render to present to front end
       fetch("https://lessons-ecommerce-website-rest-api3.onrender.com/lessons").then(
         function (response) {
           response.json().then(
             function (json) {
-              alert(json); // To show data as an alert
+              alert("Successfully connected to server");
               console.log(json); // To show data in the console
-              that.lessons = json;
-            }
-          )
-        }
-      )/** ,
-      //set the url to your server and route
-      fetch("https://lessons-ecommerce-website-rest-api3.onrender.com/lessons", {
-        method: "POST", //set the HTTP method as "POST"
-        headers: {
-          "Content-Type": "application/json", //set the data type as JSON
-        },
-        body: JSON.stringify(this.lesson) //need to stringify the JSON
-      }).then(
-        function (response) {
-          response.json().then(
-            function (json) {
-              alert("Success: " + json.acknowledged);
-              console.log("Success: " + json.acknowledged);
-              that.lessons.push(this.lesson);
+              that.lessons = json; // assign lessons to response json data
             }
           )
         }
       )
-  */
-
+    },
+    // Disables cart if it has a length (1 lesson id) of 1
+    isCartNotEmpty() {
+      return this.cart.length > 0;
     }
   }
-
-
-/** 
-// Functionality to show specific sections after hiding the mainPage section
-  // To hide the mainPage section that's visible by default
-  function hideMainPage() {
-    document.getElementById('mainPage').style.display = 'none';
-  }
-
-  // To show the targeted section and hide the mainPage section once another section is selected
-  function showSection(sectionId) {
-    // Calling function that hides the mainPage section
-    hideMainPage();
-    // Updates the hash in the URL to show the targeted section
-    window.location.hash = sectionId.substring(1);
-  }
-  */
-
-/*
-
-*/
 </script>
 
 <style>
@@ -570,14 +589,6 @@ p {
   align-items: center;
   border-color: darkgrey;
 }
-
-
-
-/* Styling for each individual lesson / lesson div
-#lesson-item {
-
-}
-*/
 
 /* Styling of each individual image displayed in div */
 .lesson-image {
@@ -691,7 +702,7 @@ p {
 
 /*Cart icon*/
 #carticon {
-  margin-left: 70%;
+  margin-left: 80%;
   margin-top: 10px;
   margin-bottom: -30px;
 }
@@ -700,10 +711,5 @@ p {
 .addToCartButton {
   border-radius: 15px;
   border: solid 1px;
-}
-
-/*Change colour of button when hovering over it*/
-button:hover {
-  background-color: darkgray;
 }
 </style>
